@@ -1,0 +1,87 @@
+buildscript {
+	ext {
+		springBootVersion = '1.5.8.RELEASE'
+	}
+	repositories {
+		mavenCentral()
+		jcenter()
+		maven{
+			url "https://plugins.gradle.org/m2/"
+		}
+	}
+	dependencies {
+		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+		classpath "com.moowork.gradle:gradle-node-plugin:1.2.0"
+	}
+}
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'war'
+apply plugin: 'com.moowork.node'
+
+group = 'org.SDVModSight'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = 1.8
+
+node {
+	version = '8.9.3'
+	npmVersion = '5.5.1'
+
+	download = true
+	//distBaseUrl = Custom install location
+}
+
+war {
+    baseName = 'webpack-gradle'
+    version = '0.0.1'
+}
+
+repositories {
+	mavenCentral()
+}
+
+
+ext {
+	vaadinVersion = '8.1.0'
+}
+
+dependencies {
+	compile('org.springframework.boot:spring-boot-starter-thymeleaf')
+	compile('com.vaadin:vaadin-spring-boot-starter')
+	compile('org.springframework.boot:spring-boot-starter-web')
+	runtime('org.springframework.boot:spring-boot-devtools')
+	testCompile('org.springframework.boot:spring-boot-starter-test')
+
+
+	compile('org.webjars:npm:3.9.3')
+
+
+}
+
+dependencyManagement {
+	imports {
+		mavenBom "com.vaadin:vaadin-bom:${vaadinVersion}"
+	}
+}
+
+/*task webpack(type:Exec) {
+	//this requires commandLine, which varies depending on OS
+	inputs.file("package-lock.json")
+	inputs.dir("src/js")
+	//note: Add inputs.file("webpack.config.js") for projects that have it
+	outputs.dir("$projectDir/src/main/resources/static/built")
+
+	commandLine "$projectDir/node_modules/.bin/webpack", "src/main/js/app.jsx", "$projectDir/src/main/resources/static/built/bundle.js"
+}*/
+import com.moowork.gradle.node.task.NodeTask
+
+task webpack(type: NodeTask, dependsOn: 'npmInstall') {
+	script = project.file('node_modules/.bin/webpack')
+}
+
+processResources.dependsOn 'webpack'
+
+clean.delete << file('node_modules')
+clean.delete << file('src/main/resources/static/built')

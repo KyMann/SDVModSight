@@ -1,0 +1,29 @@
+body {
+    font-family: sans-serif;
+}
+
+nav {
+    margin-bottom: 20px;
+}
+
+.seat {
+    display: inline-block;
+    width: 40px;
+    text-align: center;
+}
+
+.seat.open {
+    background-color: green;
+}
+
+.seat.reserved{
+    background-color: red;
+}
+
+.table {
+    margin-bottom: 10px;
+}
+
+.table-title{
+    font-weight: bold;
+}
